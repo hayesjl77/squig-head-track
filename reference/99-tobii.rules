@@ -1,0 +1,4 @@
+# Tobii Eye Tracker 5 - allow user access to hidraw and USB device
+# Vendor: 2104 (Tobii Technology AB), Product: 0313 (EyeChip)
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="2104", ATTRS{idProduct}=="0313", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="2104", ATTRS{idProduct}=="0313", MODE="0666"

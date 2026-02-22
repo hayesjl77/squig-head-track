@@ -1,0 +1,54 @@
+--- a/tracker-tobii/CMakeLists.txt
++++ b/tracker-tobii/CMakeLists.txt
+@@ -1,21 +1,33 @@
+-if(WIN32)
+-    # https://www.nuget.org/packages/Tobii.StreamEngine.Native/
+-    set(SDK_TOBII "" CACHE PATH "Tobii Stream Engine path")
+-endif()
+-if(WIN32 AND SDK_TOBII)
+-    otr_module(tracker-tobii)
+-
+-    if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
+-        set(arch "x86")
+-    else()
+-        set(arch "x64")
+-    endif()
+-
+-    target_include_directories(${self} SYSTEM PRIVATE "${SDK_TOBII}/include")
+-    target_link_directories(${self} PRIVATE "${SDK_TOBII}/lib/${arch}")
++# https://www.nuget.org/packages/Tobii.StreamEngine.Native/
++set(SDK_TOBII "" CACHE PATH "Tobii Stream Engine path")
+
+-    set(dll "${SDK_TOBII}/lib/${arch}/tobii_stream_engine.dll")
+-    set(lib tobii_stream_engine.lib)
++if(WIN32 AND SDK_TOBII)
++    otr_module(tracker-tobii)
++    if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
++        set(arch "x86")
++    else()
++        set(arch "x64")
++    endif()
++    target_include_directories(${self} SYSTEM PRIVATE "${SDK_TOBII}/include")
++    target_link_directories(${self} PRIVATE "${SDK_TOBII}/lib/${arch}")
++    set(dll "${SDK_TOBII}/lib/${arch}/tobii_stream_engine.dll")
++    set(lib tobii_stream_engine.lib)
++    target_link_libraries(${self} PRIVATE ${lib})
++    install(FILES ${dll} DESTINATION ${opentrack-libexec})
++elseif(UNIX AND NOT APPLE)
++    # Linux: check if the Tobii Stream Engine is installed system-wide
++    find_library(TOBII_STREAM_ENGINE tobii_stream_engine)
++    find_path(TOBII_INCLUDE_DIR tobii/tobii.h)
++    if(TOBII_STREAM_ENGINE AND TOBII_INCLUDE_DIR)
++        otr_module(tracker-tobii)
++        target_include_directories(${self} SYSTEM PRIVATE "${TOBII_INCLUDE_DIR}")
++        target_link_libraries(${self} PRIVATE ${TOBII_STREAM_ENGINE})
+
+-    target_link_libraries(${self} PRIVATE ${lib})
+-    install(FILES ${dll} DESTINATION ${opentrack-libexec})
++        # Also install the .so alongside opentrack if it's not in a standard path
++        get_filename_component(_tobii_dir "${TOBII_STREAM_ENGINE}" DIRECTORY)
++        install(FILES ${TOBII_STREAM_ENGINE} DESTINATION ${opentrack-libexec} OPTIONAL)
++    else()
++        message(STATUS "Tobii Stream Engine not found - skipping tracker-tobii")
++    endif()
+ endif()
