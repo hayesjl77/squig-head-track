@@ -183,7 +183,11 @@ sudo cp /tmp/opentrack-tracker-tobii.so /usr/libexec/opentrack/
 opentrack
 ```
 
-In the tracker dropdown, select **"Tobii Eye Tracker"**. The plugin uses `gaze_origin` to derive head pose via simple `atan2` on the inter-eye vector. This gives:
+In the tracker dropdown, select **"Tobii Eye Tracker"**. Once working, you should see live tracking data:
+
+![opentrack receiving Tobii tracking data on Linux](../images/opentrack-tobii-working.png)
+
+The plugin uses `gaze_origin` to derive head pose via simple `atan2` on the inter-eye vector. This gives:
 
 - **Yaw**: Decent (+/-5-8 deg accuracy)
 - **Roll**: Reasonable (+/-3 deg)
