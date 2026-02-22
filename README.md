@@ -12,58 +12,58 @@ Binary analysis confirms: `tobii_head_pose_subscribe` calls `tobii_stream_subscr
 
 This project explores two approaches to solve this:
 
-| Approach | Method | Status |
-|----------|--------|--------|
-| **A** — Gaze-Origin Derivation | Biomechanical head model + EKF from `gaze_origin` stream | Planned (see [Option C doc](docs/TOBII_HEAD_TRACKING_OPTION_C.md)) |
-| **B** — Raw IR Camera Capture | Direct UVC frame capture from the unclaimed video interfaces | **Working** (`ir_viewer`) |
+| Approach                       | Method                                                       | Status                                                             |
+| ------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| **A** — Gaze-Origin Derivation | Biomechanical head model + EKF from `gaze_origin` stream     | Planned (see [Option C doc](docs/TOBII_HEAD_TRACKING_OPTION_C.md)) |
+| **B** — Raw IR Camera Capture  | Direct UVC frame capture from the unclaimed video interfaces | **Working** (`ir_viewer`)                                          |
 
 ---
 
 ## Hardware
 
-| Property | Value |
-|----------|-------|
-| **Device** | Tobii Eye Tracker 5 |
-| **USB ID** | `2104:0313` (Tobii Technology AB — EyeChip) |
-| **Serial** | IS5FF-100204422402 |
-| **Firmware** | EyeChip (IS5 platform) |
+| Property     | Value                                       |
+| ------------ | ------------------------------------------- |
+| **Device**   | Tobii Eye Tracker 5                         |
+| **USB ID**   | `2104:0313` (Tobii Technology AB — EyeChip) |
+| **Serial**   | IS5FF-100204422402                          |
+| **Firmware** | EyeChip (IS5 platform)                      |
 
 ## USB Architecture
 
 The Tobii ET5 exposes three USB interfaces:
 
-| Interface | Class | Description | Status |
-|-----------|-------|-------------|--------|
-| IF0 | `0xFF` Vendor Specific | Stream Engine data (gaze, eyes, etc.) | Claimed by `usbfs` |
-| IF1 | `0x0E` Video Control | UVC control interface | **UNCLAIMED** — we claim this |
-| IF2 | `0x0E` Video Streaming | IR camera frames | **UNCLAIMED** — we read from this |
+| Interface | Class                  | Description                           | Status                            |
+| --------- | ---------------------- | ------------------------------------- | --------------------------------- |
+| IF0       | `0xFF` Vendor Specific | Stream Engine data (gaze, eyes, etc.) | Claimed by `usbfs`                |
+| IF1       | `0x0E` Video Control   | UVC control interface                 | **UNCLAIMED** — we claim this     |
+| IF2       | `0x0E` Video Streaming | IR camera frames                      | **UNCLAIMED** — we read from this |
 
 The vendor-specific interface (IF0) is used by Stream Engine for gaze tracking. The UVC video interfaces (IF1 + IF2) are **completely independent** and unclaimed by any driver on Linux. This is the basis of Approach B.
 
 ### Video Stream Specifications
 
-| Property | Value |
-|----------|-------|
-| Resolution | 642×480 |
-| Bits per pixel | 8 (grayscale IR) |
-| Frame rate | 24 fps |
+| Property          | Value                                                  |
+| ----------------- | ------------------------------------------------------ |
+| Resolution        | 642×480                                                |
+| Bits per pixel    | 8 (grayscale IR)                                       |
+| Frame rate        | 24 fps                                                 |
 | Pixel format GUID | `{e39e1ba2-1599-3248-8728-e1b25923a611}` (proprietary) |
-| Endpoint | EP 2 IN (`0x82`), Bulk transfer, 512 bytes max packet |
-| IAD | "Tobii Hello sensor" groups IF1+IF2 |
+| Endpoint          | EP 2 IN (`0x82`), Bulk transfer, 512 bytes max packet  |
+| IAD               | "Tobii Hello sensor" groups IF1+IF2                    |
 
 ## Confirmed Device Capabilities
 
 Verified by our `tobii_caps` and `test_tobii_caps` tools:
 
-| Capability | Supported |
-|------------|-----------|
-| `gaze_point` | **YES** |
-| `gaze_origin` | **YES** |
-| `eye_position_normalized` | **YES** |
-| `user_presence` | **YES** |
-| `notifications` | **YES** |
-| `head_pose` (stream 4, cap 2) | **NO** |
-| `user_position_guide` (cap 4-5) | **NO** |
+| Capability                      | Supported |
+| ------------------------------- | --------- |
+| `gaze_point`                    | **YES**   |
+| `gaze_origin`                   | **YES**   |
+| `eye_position_normalized`       | **YES**   |
+| `user_presence`                 | **YES**   |
+| `notifications`                 | **YES**   |
+| `head_pose` (stream 4, cap 2)   | **NO**    |
+| `user_position_guide` (cap 4-5) | **NO**    |
 
 ---
 
@@ -109,9 +109,9 @@ make clean
 
 The Makefile produces:
 
-| Target | Output | Dependencies |
-|--------|--------|--------------|
-| `make` | `build/ir_viewer` | libusb, SDL2 |
+| Target       | Output                                                           | Dependencies                  |
+| ------------ | ---------------------------------------------------------------- | ----------------------------- |
+| `make`       | `build/ir_viewer`                                                | libusb, SDL2                  |
 | `make tools` | `build/tobii_caps`, `build/test_tobii_gaze`, `build/test_tobii6` | libtobii_stream_engine, libdl |
 
 ---
@@ -137,18 +137,18 @@ sudo -E ./build/ir_viewer --rawdump
 
 #### Interactive Controls
 
-| Key | Action |
-|-----|--------|
-| **M** | Cycle display mode: raw 8-bit, de-interleave even, de-interleave odd, 16-bit LE |
-| **+/-** | Adjust display width +/-1 (hold **Shift** for +/-10) |
-| **R** | Reset width to 642 |
-| **S** | Toggle stripe filter (skip interleaved/scrambled frames) |
-| **A** | Toggle frame accumulation (stitch fragments into full frames) |
-| **H** | Toggle frame-hold (only update on consistent frames — reduces flicker) |
-| **L** | Lock onto current frame's size band |
-| **B** | Lower brightness threshold |
-| **D** | Save next displayed frame as `/tmp/tobii_frame.raw` |
-| **Q / Esc** | Quit |
+| Key         | Action                                                                          |
+| ----------- | ------------------------------------------------------------------------------- |
+| **M**       | Cycle display mode: raw 8-bit, de-interleave even, de-interleave odd, 16-bit LE |
+| **+/-**     | Adjust display width +/-1 (hold **Shift** for +/-10)                            |
+| **R**       | Reset width to 642                                                              |
+| **S**       | Toggle stripe filter (skip interleaved/scrambled frames)                        |
+| **A**       | Toggle frame accumulation (stitch fragments into full frames)                   |
+| **H**       | Toggle frame-hold (only update on consistent frames — reduces flicker)          |
+| **L**       | Lock onto current frame's size band                                             |
+| **B**       | Lower brightness threshold                                                      |
+| **D**       | Save next displayed frame as `/tmp/tobii_frame.raw`                             |
+| **Q / Esc** | Quit                                                                            |
 
 #### Display Modes Explained
 
@@ -191,6 +191,7 @@ Subscribes to `gaze_origin`, `eye_position_normalized`, and `gaze_point` simulta
 ```
 
 Example output:
+
 ```
 Device: tobii-ttp://IS5FF-100204422402
 Connected!
@@ -211,6 +212,7 @@ Subscribes to `gaze_origin` and computes head yaw from the inter-eye vector:
 ```
 
 This demonstrates the basic principle behind Approach A:
+
 ```c
 float dx = right_xyz[0] - left_xyz[0];  // X-distance between eyes
 float dz = right_xyz[2] - left_xyz[2];  // Z-distance between eyes
@@ -233,14 +235,14 @@ This tool directly links against `libtobii_stream_engine.so` (no dlopen) and use
 
 These are research/diagnostic utilities built during investigation. Build them individually with gcc:
 
-| Tool | Purpose |
-|------|---------|
-| `test_load_tobii.c` | Minimal test: just `dlopen` + `dlclose` the Stream Engine library |
-| `test_tobii_caps.c` | Extended capability checker — probes capabilities 0-30 and streams 0-20 via `dlsym` |
-| `tobii_ver.c` | Prints the Stream Engine API version (`tobii_get_api_version`) |
-| `ir_compare.c` | Compares IR frame brightness with and without Stream Engine running — proves the IR LEDs are controlled by SE |
-| `ir_diag.c` | Step-by-step interactive diagnostic: pauses after each USB operation so you can visually check which step kills the IR LEDs |
-| `test_illumination.c` | Probes `tobii_enumerate_illumination_modes`, `tobii_get_illumination_mode`, `tobii_set_illumination_mode` APIs |
+| Tool                  | Purpose                                                                                                                     |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `test_load_tobii.c`   | Minimal test: just `dlopen` + `dlclose` the Stream Engine library                                                           |
+| `test_tobii_caps.c`   | Extended capability checker — probes capabilities 0-30 and streams 0-20 via `dlsym`                                         |
+| `tobii_ver.c`         | Prints the Stream Engine API version (`tobii_get_api_version`)                                                              |
+| `ir_compare.c`        | Compares IR frame brightness with and without Stream Engine running — proves the IR LEDs are controlled by SE               |
+| `ir_diag.c`           | Step-by-step interactive diagnostic: pauses after each USB operation so you can visually check which step kills the IR LEDs |
+| `test_illumination.c` | Probes `tobii_enumerate_illumination_modes`, `tobii_get_illumination_mode`, `tobii_set_illumination_mode` APIs              |
 
 #### Building a diagnostic tool manually
 
@@ -297,13 +299,13 @@ This is presumably for **biometric privacy compliance** — Tobii doesn't want t
 
 Stream Engine exports several image subscription functions that are **hidden behind licensing**:
 
-| Symbol | Notes |
-|--------|-------|
-| `tobii_image_subscribe` | Requires "Additional Features" license |
-| `tobii_clean_ir_subscribe` | Clean IR image stream |
-| `tobii_primary_camera_image_subscribe` | Full camera image |
-| `tobii_image_collection_subscribe` | Multi-image collection |
-| `tobii_diagnostics_image_subscribe` | Diagnostic images |
+| Symbol                                 | Notes                                  |
+| -------------------------------------- | -------------------------------------- |
+| `tobii_image_subscribe`                | Requires "Additional Features" license |
+| `tobii_clean_ir_subscribe`             | Clean IR image stream                  |
+| `tobii_primary_camera_image_subscribe` | Full camera image                      |
+| `tobii_image_collection_subscribe`     | Multi-image collection                 |
+| `tobii_diagnostics_image_subscribe`    | Diagnostic images                      |
 
 All of these route through `tobii_perform_with_legacy_ttp_platmod` which enforces a paid Tobii Pro license (obtained via `tobii_device_create_ex`). These are not usable with a consumer eye tracker.
 
@@ -312,6 +314,7 @@ All of these route through `tobii_perform_with_legacy_ttp_platmod` which enforce
 The fundamental challenge of Approach A: **two eyes give you two 3D points**, which is excellent for yaw (left-right) and roll (head tilt), but inherently weak for pitch (up-down). Both eyes sit approximately in the same horizontal plane, so looking up vs. leaning back produces similar gaze_origin changes.
 
 The planned solution (see [Option C doc](docs/TOBII_HEAD_TRACKING_OPTION_C.md)) combines multiple weak signals:
+
 - Apparent IPD change (inter-eye distance changes with pitch)
 - Midpoint Z displacement
 - `gaze_point` Y coordinate as a secondary pitch indicator
@@ -324,13 +327,13 @@ The planned solution (see [Option C doc](docs/TOBII_HEAD_TRACKING_OPTION_C.md)) 
 
 The binary exports several **license-gated** image functions:
 
-| Symbol | Notes |
-|--------|-------|
-| `tobii_image_subscribe` | Requires "Additional Features" license |
-| `tobii_clean_ir_subscribe` | IR image stream (license-gated) |
-| `tobii_primary_camera_image_subscribe` | Full camera image (license-gated) |
-| `tobii_image_collection_subscribe` | Multi-image collection (license-gated) |
-| `tobii_diagnostics_image_subscribe` | Diagnostic images (license-gated) |
+| Symbol                                 | Notes                                  |
+| -------------------------------------- | -------------------------------------- |
+| `tobii_image_subscribe`                | Requires "Additional Features" license |
+| `tobii_clean_ir_subscribe`             | IR image stream (license-gated)        |
+| `tobii_primary_camera_image_subscribe` | Full camera image (license-gated)      |
+| `tobii_image_collection_subscribe`     | Multi-image collection (license-gated) |
+| `tobii_diagnostics_image_subscribe`    | Diagnostic images (license-gated)      |
 
 All route through `tobii_perform_with_legacy_ttp_platmod` which enforces licensing. These require a paid Tobii Pro license obtained via `tobii_device_create_ex`.
 
@@ -380,6 +383,8 @@ squig-head-track/
 
 ## opentrack Integration
 
+> **Full step-by-step guide**: [patches/HOWTO_OPENTRACK_PATCH.md](patches/HOWTO_OPENTRACK_PATCH.md) — covers applying the patch, fixing the broken SDK header, building, and troubleshooting.
+
 ### The Patch
 
 The file `patches/tobii-linux-opentrack.patch` modifies the opentrack `tracker-tobii` CMakeLists.txt to build on Linux. The upstream plugin is Windows-only; our patch adds a Linux code path that:
@@ -387,6 +392,13 @@ The file `patches/tobii-linux-opentrack.patch` modifies the opentrack `tracker-t
 1. Uses `find_library()` and `find_path()` to locate the system-installed Stream Engine
 2. Links against the shared `.so` instead of the Windows `.lib`
 3. Optionally installs the `.so` alongside opentrack
+
+### Custom Header Fix
+
+The Tobii Stream Engine v4 SDK ships a **broken header** — `tobii_device_create` is declared with 3 parameters but the binary expects 4 (with a `field_of_use` enum). This causes segfaults on Linux. Two fixes are provided:
+
+- **`reference/tobii_header.h`** — A complete reconstructed header (2600+ lines) with the correct 4-arg signature. Drop-in replacement for `/usr/include/tobii/tobii.h`.
+- **`reference/fix_tobii_header.py`** — A script that patches an existing header file in-place, adding the `tobii_field_of_use_t` enum and correcting the function signature.
 
 ### Building the opentrack Plugin Manually
 
@@ -442,13 +454,13 @@ The full design is in [docs/TOBII_HEAD_TRACKING_OPTION_C.md](docs/TOBII_HEAD_TRA
 
 ### Target Accuracy
 
-| DOF | Current (simple atan2) | Target (with EKF) |
-|-----|----------------------|-------------------|
-| Yaw | +/-5-8 deg | +/-2 deg |
-| Pitch | +/-15 deg+ | +/-4 deg |
-| Roll | +/-3 deg | +/-2 deg |
-| Translation | +/-5mm | +/-3mm |
-| Latency | ~15ms | <15ms |
+| DOF         | Current (simple atan2) | Target (with EKF) |
+| ----------- | ---------------------- | ----------------- |
+| Yaw         | +/-5-8 deg             | +/-2 deg          |
+| Pitch       | +/-15 deg+             | +/-4 deg          |
+| Roll        | +/-3 deg               | +/-2 deg          |
+| Translation | +/-5mm                 | +/-3mm            |
+| Latency     | ~15ms                  | <15ms             |
 
 ---
 
@@ -484,13 +496,13 @@ The full design is in [docs/TOBII_HEAD_TRACKING_OPTION_C.md](docs/TOBII_HEAD_TRA
 
 ## Dependencies
 
-| Library | Purpose | Package |
-|---------|---------|---------|
-| `libusb-1.0` | USB device access for IR viewer | `libusb` / `libusb-1.0-0-dev` |
-| `SDL2` | Window/rendering for IR viewer | `sdl2` / `libsdl2-dev` |
-| `libtobii_stream_engine.so` | Tobii gaze data (v4.24.0) | [Tobii SDK](https://developer.tobii.com/) |
-| `libdl` | Runtime symbol resolution (`dlopen`/`dlsym`) | Built-in (glibc) |
-| `libm` | Math functions (`atan2f`, etc.) | Built-in (glibc) |
+| Library                     | Purpose                                      | Package                                   |
+| --------------------------- | -------------------------------------------- | ----------------------------------------- |
+| `libusb-1.0`                | USB device access for IR viewer              | `libusb` / `libusb-1.0-0-dev`             |
+| `SDL2`                      | Window/rendering for IR viewer               | `sdl2` / `libsdl2-dev`                    |
+| `libtobii_stream_engine.so` | Tobii gaze data (v4.24.0)                    | [Tobii SDK](https://developer.tobii.com/) |
+| `libdl`                     | Runtime symbol resolution (`dlopen`/`dlsym`) | Built-in (glibc)                          |
+| `libm`                      | Math functions (`atan2f`, etc.)              | Built-in (glibc)                          |
 
 ## References
 
