@@ -1,3 +1,7 @@
+/* Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License
+ * See LICENSE file for details.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>

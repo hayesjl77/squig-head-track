@@ -3,6 +3,9 @@
  *
  * Tries to enumerate and set illumination modes to figure out
  * how to turn on the IR LEDs on Linux.
+ *
+ * Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License
+ * See LICENSE file for details.
  */
 
 #include <stdio.h>

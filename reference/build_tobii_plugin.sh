@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License
+# See LICENSE file for details.
+
 set -ex
 
 SRC=/tmp/opentrack-opentrack-2026.1.0/tracker-tobii

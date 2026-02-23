@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License
+# See LICENSE file for details.
+
 import sys
 
 path = '/tmp/tobii_header.h'

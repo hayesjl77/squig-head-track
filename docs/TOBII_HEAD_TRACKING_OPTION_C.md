@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License. See LICENSE. -->
+
 # Option C: High-Fidelity Head Tracking from Tobii Eye Tracker 5 via gaze_origin
 
 ## Problem Statement

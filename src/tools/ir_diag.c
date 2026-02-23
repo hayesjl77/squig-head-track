@@ -3,6 +3,9 @@
  *
  * Pauses between each USB operation so you can visually observe
  * which step turns off the IR emitters.
+ *
+ * Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License
+ * See LICENSE file for details.
  */
 
 #include <stdio.h>

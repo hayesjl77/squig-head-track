@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License. See LICENSE. -->
+
 # How to Patch opentrack for Tobii Eye Tracker 5 on Linux
 
 The upstream [opentrack](https://github.com/opentrack/opentrack) Tobii tracker plugin is **Windows-only**. This guide walks you through patching it to build and run on Linux, including fixing the broken SDK header that ships with the Tobii Stream Engine.

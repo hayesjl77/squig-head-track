@@ -1,3 +1,6 @@
+# Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License
+# See LICENSE file for details.
+
 CC = gcc
 CFLAGS = -O2 -Wall -Wextra
 PKG_LIBUSB = $(shell pkg-config --cflags --libs libusb-1.0)

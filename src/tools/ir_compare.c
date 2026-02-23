@@ -3,6 +3,9 @@
  *
  * Captures frames via libusb IF2, first WITHOUT SE (ambient IR only),
  * then WITH SE (IR LEDs pulsing). Compares statistics to prove LEDs are active.
+ *
+ * Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License
+ * See LICENSE file for details.
  */
 
 #include <stdio.h>

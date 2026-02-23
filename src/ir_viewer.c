@@ -40,7 +40,8 @@
  *   sudo -E ./ir_viewer --dump       # text stats + analysis
  *   sudo -E ./ir_viewer --rawdump    # save raw USB packet stream
  *
- * Copyright 2026 Squig AI — MIT License
+ * Copyright (c) 2026 Squig-AI (squig-ai.com) — MIT License
+ * See LICENSE file for details.
  */
 
 #include <stdio.h>
